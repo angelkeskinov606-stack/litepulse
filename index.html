@@ -1,0 +1,2183 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="theme-color" content="#1877f2" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="LitePulse" />
+  <title>LitePulse</title>
+  <style>
+    :root {
+      --bg: #f0f2f5;
+      --card: #ffffff;
+      --text: #050505;
+      --muted: #65676b;
+      --blue: #1877f2;
+      --blue-soft: #e7f3ff;
+      --border: #dadde1;
+      --danger: #d93025;
+      --danger-soft: #fdecea;
+      --online: #31a24c;
+      --ok-soft: #e9f7ed;
+      --mod-bg: #fff4e5;
+      --mod-fg: #b25000;
+      --admin-bg: #e7f3ff;
+      --admin-fg: #1877f2;
+      --owner-bg: #f3e8ff;
+      --owner-fg: #6b21a8;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding-bottom: 86px;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 25;
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--blue);
+      letter-spacing: -0.4px;
+    }
+
+    .live-pill {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--online);
+      background: var(--ok-soft);
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .me-pill {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--bg);
+      padding: 4px 10px 4px 5px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .dots-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 18px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .dots-btn.active {
+      background: var(--blue-soft);
+      color: var(--blue);
+      border-color: var(--blue);
+    }
+
+    .avatar-box {
+      position: relative;
+      display: inline-flex;
+      flex-shrink: 0;
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--blue);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      object-fit: cover;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    .avatar.sm {
+      width: 28px;
+      height: 28px;
+      font-size: 11px;
+    }
+
+    .avatar.lg {
+      width: 76px;
+      height: 76px;
+      font-size: 24px;
+    }
+
+    .online-dot {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--online);
+      border: 2px solid #fff;
+    }
+
+    .role-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      padding: 2px 7px;
+      border-radius: 6px;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    .role-badge.admin {
+      background: var(--admin-bg);
+      color: var(--admin-fg);
+    }
+
+    .role-badge.moderator {
+      background: var(--mod-bg);
+      color: var(--mod-fg);
+    }
+
+    .role-badge.owner {
+      background: var(--owner-bg);
+      color: var(--owner-fg);
+    }
+
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 12px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+
+    .section-title {
+      margin: 0 0 8px;
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .sub-muted {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .fb-profile-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 12px;
+      background: var(--bg);
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+
+    .fb-create-page {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 12px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      margin-bottom: 12px;
+      text-align: left;
+    }
+
+    .shortcuts-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .shortcut-tile {
+      background: var(--bg);
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      text-align: left;
+    }
+
+    .menu-list-btn {
+      width: 100%;
+      background: var(--card);
+      border: none;
+      border-bottom: 1px solid var(--border);
+      padding: 12px 6px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .menu-list-btn:last-child {
+      border-bottom: none;
+    }
+
+    .menu-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .price-tag {
+      font-size: 12px;
+      font-weight: 800;
+      background: var(--ok-soft);
+      color: var(--online);
+      padding: 3px 8px;
+      border-radius: 999px;
+    }
+
+    textarea, input[type="text"], input[type="url"], input[type="number"], select {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-family: inherit;
+      font-size: 15px;
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+    }
+
+    textarea {
+      min-height: 76px;
+      resize: vertical;
+    }
+
+    textarea:focus, input:focus, select:focus {
+      border-color: var(--blue);
+      background: #fff;
+    }
+
+    .composer-top {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .emoji-bar {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .emoji-btn {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .composer-extra {
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 8px;
+      padding: 9px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    .btn-primary {
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .btn-secondary {
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .btn-soft-blue {
+      background: var(--blue-soft);
+      color: var(--blue);
+    }
+
+    .btn-danger-soft {
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+
+    .btn-danger-text {
+      background: transparent;
+      color: var(--danger);
+      padding: 4px 8px;
+      font-size: 12px;
+    }
+
+    .post-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .post-author-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .author-name {
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .post-time {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .post-text {
+      font-size: 15px;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      margin-bottom: 10px;
+    }
+
+    .post-img {
+      width: 100%;
+      max-height: 360px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      border: 1px solid var(--border);
+    }
+
+    .post-stats {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--muted);
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .reactions-row {
+      display: flex;
+      gap: 5px;
+      padding: 8px 0 4px;
+      flex-wrap: wrap;
+    }
+
+    .react-chip {
+      border: 1px solid var(--border);
+      background: var(--bg);
+      border-radius: 999px;
+      padding: 4px 9px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text);
+    }
+
+    .react-chip.active {
+      background: var(--blue-soft);
+      border-color: var(--blue);
+      color: var(--blue);
+    }
+
+    .comments-box {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+    }
+
+    .comment-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 7px;
+      font-size: 13px;
+    }
+
+    .comment-bubble {
+      background: var(--bg);
+      border-radius: 12px;
+      padding: 7px 11px;
+      flex: 1;
+    }
+
+    .comment-author {
+      font-weight: 700;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .comment-form {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .comment-form input {
+      padding: 8px 11px;
+      font-size: 13px;
+    }
+
+    .friend-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .friend-row:last-child {
+      border-bottom: none;
+    }
+
+    .friend-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 150px;
+      flex: 1;
+      cursor: pointer;
+    }
+
+    .row-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .chat-header-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .chat-thread {
+      max-height: 320px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 10px;
+      background: var(--bg);
+      border-radius: 10px;
+      margin: 10px 0;
+    }
+
+    .msg-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+    }
+
+    .msg-row.me {
+      justify-content: flex-end;
+    }
+
+    .msg {
+      max-width: 76%;
+      padding: 9px 12px;
+      border-radius: 14px;
+      font-size: 14px;
+      line-height: 1.35;
+      word-break: break-word;
+    }
+
+    .msg.me {
+      background: var(--blue);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+
+    .msg.them {
+      background: #fff;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 4px;
+    }
+
+    .msg-meta {
+      font-size: 11px;
+      opacity: 0.75;
+      margin-top: 3px;
+    }
+
+    .notif-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      background: var(--bg);
+    }
+
+    .notif-item.unread {
+      background: var(--blue-soft);
+      border-left: 4px solid var(--blue);
+    }
+
+    .field-group {
+      margin-bottom: 10px;
+    }
+
+    .field-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .code-box {
+      background: var(--blue-soft);
+      border: 1px dashed var(--blue);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .code-digits {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: 5px;
+      color: var(--blue);
+      margin: 4px 0;
+    }
+
+    .warn-banner {
+      background: var(--danger-soft);
+      color: var(--danger);
+      border: 1px solid #f5c2c7;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .success-banner {
+      background: var(--ok-soft);
+      color: var(--online);
+      border: 1px solid #b7e3c3;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .error-text {
+      color: var(--danger);
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 5px;
+    }
+
+    .toast {
+      position: fixed;
+      top: 62px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1c1e21;
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      z-index: 60;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      display: none;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 30;
+      background: var(--card);
+      border-top: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      padding: 6px 2px calc(6px + env(safe-area-inset-bottom));
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 600;
+      padding: 6px 2px;
+      border-radius: 8px;
+      cursor: pointer;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .nav-btn.active {
+      color: var(--blue);
+      background: var(--blue-soft);
+    }
+
+    .nav-icon {
+      font-size: 17px;
+      line-height: 1;
+    }
+
+    .badge {
+      position: absolute;
+      top: 2px;
+      right: 12%;
+      background: var(--danger);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      min-width: 15px;
+      height: 15px;
+      border-radius: 999px;
+      padding: 0 3px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: var(--muted);
+      padding: 20px 10px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand-wrap">
+      <div class="brand">LitePulse</div>
+      <span class="live-pill">LIVE CHAT</span>
+    </div>
+    <div class="top-actions">
+      <button class="me-pill" onclick="switchTab('profile')" title="Профил и регистрация">
+        <span id="topAvatarWrap"></span>
+        <span id="topName">Ангел</span>
+      </button>
+      <button class="dots-btn" id="dotsMenuBtn" onclick="switchTab('menu')" title="Меню и настройки">•••</button>
+    </div>
+  </header>
+
+  <div class="toast" id="liveToast"></div>
+
+  <main class="container" id="app"></main>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-tab="feed" onclick="switchTab('feed')">
+      <span class="nav-icon">📰</span>
+      <span>Новини</span>
+    </button>
+    <button class="nav-btn" data-tab="messages" onclick="switchTab('messages')">
+      <span class="nav-icon">💬</span>
+      <span>Съобщения</span>
+    </button>
+    <button class="nav-btn" data-tab="friends" onclick="switchTab('friends')">
+      <span class="nav-icon">👥</span>
+      <span>Приятели</span>
+    </button>
+    <button class="nav-btn" data-tab="notifications" onclick="switchTab('notifications')">
+      <span class="nav-icon">🔔</span>
+      <span>Известия</span>
+      <span class="badge" id="notifBadge" style="display:none;">0</span>
+    </button>
+    <button class="nav-btn" data-tab="profile" onclick="switchTab('profile')">
+      <span class="nav-icon">🧑</span>
+      <span>Профил</span>
+    </button>
+  </nav>
+
+  <script>
+    const STORAGE_KEY = "litepulse_fb_roles_live_v4";
+    const OWNER_ID = "angel";
+    const MOD_PRICE_EUR = 5;
+    const ADMIN_PRICE_EUR = 20;
+    const DAY_MS = 24 * 60 * 60 * 1000;
+
+    const QUICK_EMOJIS = ["😂", "❤️", "🔥", "👍", "😎", "😡", "😢", "🎉"];
+    const REACTION_TYPES = [
+      { key: "like", icon: "👍" },
+      { key: "love", icon: "❤️" },
+      { key: "haha", icon: "😂" },
+      { key: "wow", icon: "😮" },
+      { key: "sad", icon: "😢" },
+      { key: "angry", icon: "😡" }
+    ];
+
+    const DEFAULT_USERS = [
+      { id: "angel", name: "Ангел", contact: "angel@litepulse.bg", initials: "АК", color: "#1877f2", bio: "Собственик на LitePulse", avatarUrl: "", online: true },
+      { id: "ivan", name: "Иван Петров", contact: "ivan@litepulse.bg", initials: "ИП", color: "#0f9d58", bio: "Лайф чат и новини", avatarUrl: "", online: true },
+      { id: "elena", name: "Елена Георгиева", contact: "elena@litepulse.bg", initials: "ЕГ", color: "#db4437", bio: "Снимки и музика", avatarUrl: "", online: true },
+      { id: "georgi", name: "Георги Димитров", contact: "georgi@litepulse.bg", initials: "ГД", color: "#673ab7", bio: "Технологии и мрежи", avatarUrl: "", online: false },
+      { id: "maria", name: "Мария Николова", contact: "maria@litepulse.bg", initials: "МН", color: "#e67e22", bio: "Кафе и разходки", avatarUrl: "", online: true }
+    ];
+
+    const bc = typeof BroadcastChannel !== "undefined" ? new BroadcastChannel("litepulse_live_channel") : null;
+
+    function nowTime() {
+      const d = new Date();
+      return d.toLocaleTimeString("bg-BG", { hour: "2-digit", minute: "2-digit" });
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById("liveToast");
+      if (!el) return;
+      el.textContent = msg;
+      el.style.display = "block";
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => {
+        el.style.display = "none";
+      }, 2500);
+    }
+
+    function makeInitials(name) {
+      const parts = String(name || "").trim().split(/\s+/).filter(Boolean);
+      if (!parts.length) return "LP";
+      if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+
+    function isSafeImage(url) {
+      if (!url) return false;
+      return /^https?:\/\//i.test(url) || /^data:image\/(png|jpeg|jpg|webp|gif);base64,/i.test(url);
+    }
+
+    function emptyReactions() {
+      return { like: [], love: [], haha: [], wow: [], sad: [], angry: [] };
+    }
+
+    function generateSixDigitCode() {
+      return String(Math.floor(100000 + Math.random() * 900000));
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch (e) {}
+
+      return {
+        currentUserId: OWNER_ID,
+        customUsers: [],
+        deletedUserIds: [],
+        profileOverride: { name: "Ангел", bio: "Собственик на LitePulse", avatarUrl: "" },
+        pendingReg: null,
+        regSuccessMsg: "",
+        regError: "",
+        activeTab: "feed",
+        inspectedUserId: null,
+        selectedChatUserId: "ivan",
+        friends: ["ivan", "elena", "maria"],
+        blocked: [],
+        moderators: [],
+        admins: [],
+        mutedUntil: {},
+        bannedUntil: {},
+        salesLog: [],
+        posts: [
+          {
+            id: "p1",
+            authorId: "ivan",
+            text: "Новият LitePulse е тук — лайф чат, новини, известия, меню с трите точки и роли ADMIN / MODERATOR 🔥",
+            imageUrl: "",
+            time: "току-що",
+            reactions: { like: ["elena"], love: ["maria"], haha: [], wow: [], sad: [], angry: [] },
+            comments: [
+              { id: "c1", authorId: "elena", text: "Супер меню като във Фейсбук 😄❤️", time: "току-що" }
+            ]
+          }
+        ],
+        messages: {
+          ivan: [{ id: "m1", from: "ivan", text: "Здрасти! Лайф чатът работи на живо 😎", time: nowTime() }],
+          elena: [{ id: "m2", from: "elena", text: "Привет! Как са новините днес?", time: nowTime() }],
+          maria: [{ id: "m3", from: "maria", text: "Здравей! На линия съм 👋", time: nowTime() }]
+        },
+        notifications: [
+          { id: "n1", actorId: "ivan", text: "Иван Петров пусна ново съобщение в лайф чата.", time: "днес", read: false },
+          { id: "n2", actorId: "elena", text: "Елена Георгиева коментира в Новини.", time: "днес", read: false }
+        ]
+      };
+    }
+
+    let state = loadState();
+    if (!Array.isArray(state.customUsers)) state.customUsers = [];
+    if (!Array.isArray(state.deletedUserIds)) state.deletedUserIds = [];
+    if (!Array.isArray(state.moderators)) state.moderators = [];
+    if (!Array.isArray(state.admins)) state.admins = [];
+    if (!state.mutedUntil || typeof state.mutedUntil !== "object") state.mutedUntil = {};
+    if (!state.bannedUntil || typeof state.bannedUntil !== "object") state.bannedUntil = {};
+    if (!Array.isArray(state.salesLog)) state.salesLog = [];
+
+    function purgeExpiredPunishments() {
+      const now = Date.now();
+      let changed = false;
+      Object.keys(state.mutedUntil).forEach((uid) => {
+        if (state.mutedUntil[uid] <= now) {
+          delete state.mutedUntil[uid];
+          changed = true;
+        }
+      });
+      Object.keys(state.bannedUntil).forEach((uid) => {
+        if (state.bannedUntil[uid] <= now) {
+          delete state.bannedUntil[uid];
+          changed = true;
+        }
+      });
+      return changed;
+    }
+
+    function getMuteRemainingDays(userId) {
+      purgeExpiredPunishments();
+      const until = state.mutedUntil[userId] || 0;
+      const diff = until - Date.now();
+      if (diff <= 0) return 0;
+      return Math.max(1, Math.ceil(diff / DAY_MS));
+    }
+
+    function getBanRemainingDays(userId) {
+      purgeExpiredPunishments();
+      const until = state.bannedUntil[userId] || 0;
+      const diff = until - Date.now();
+      if (diff <= 0) return 0;
+      return Math.max(1, Math.ceil(diff / DAY_MS));
+    }
+
+    function getAllUsers() {
+      const merged = [...DEFAULT_USERS, ...state.customUsers];
+      return merged.filter((u) => !state.deletedUserIds.includes(u.id));
+    }
+
+    function getUser(id) {
+      if (id === state.currentUserId && !state.deletedUserIds.includes(id)) {
+        const base = getAllUsers().find((u) => u.id === id) || {
+          id, name: "Ангел", contact: "", initials: "АК", color: "#1877f2", bio: "", avatarUrl: "", online: true
+        };
+        const ov = state.profileOverride || {};
+        const name = (ov.name || base.name).trim() || base.name;
+        return {
+          ...base,
+          name,
+          initials: makeInitials(name),
+          bio: ov.bio !== undefined ? ov.bio : base.bio,
+          avatarUrl: ov.avatarUrl !== undefined ? ov.avatarUrl : base.avatarUrl,
+          online: true
+        };
+      }
+      return getAllUsers().find((u) => u.id === id) || {
+        id, name: "Потребител", contact: "", initials: "ПТ", color: "#1877f2", bio: "", avatarUrl: "", online: false
+      };
+    }
+
+    function getRoleLabel(userId) {
+      if (userId === OWNER_ID) return "OWNER";
+      if (state.admins.includes(userId)) return "ADMIN";
+      if (state.moderators.includes(userId)) return "MODERATOR";
+      return "";
+    }
+
+    function renderRoleBadge(userId) {
+      const role = getRoleLabel(userId);
+      if (!role) return "";
+      const cls = role === "ADMIN" ? "admin" : role === "MODERATOR" ? "moderator" : "owner";
+      return `<span class="role-badge ${cls}">${escapeHtml(role)}</span>`;
+    }
+
+    function isOwner(userId = state.currentUserId) {
+      return userId === OWNER_ID;
+    }
+
+    function isAdmin(userId = state.currentUserId) {
+      return isOwner(userId) || state.admins.includes(userId);
+    }
+
+    function isModerator(userId = state.currentUserId) {
+      return state.moderators.includes(userId);
+    }
+
+    function saveState(broadcast = true) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      renderBadge();
+      if (broadcast && bc) {
+        bc.postMessage({ type: "sync", state });
+      }
+    }
+
+    if (bc) {
+      bc.onmessage = (ev) => {
+        if (ev.data && ev.data.type === "sync" && ev.data.state) {
+          state = ev.data.state;
+          purgeExpiredPunishments();
+          render();
+          showToast("Обновление на живо!");
+        }
+      };
+    }
+
+    window.addEventListener("storage", (ev) => {
+      if (ev.key === STORAGE_KEY && ev.newValue) {
+        try {
+          state = JSON.parse(ev.newValue);
+          purgeExpiredPunishments();
+          render();
+        } catch (e) {}
+      }
+    });
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function renderAvatar(user, sizeClass = "", showOnline = false) {
+      const cls = ["avatar", sizeClass].filter(Boolean).join(" ");
+      const dot = showOnline && user.online ? `<span class="online-dot"></span>` : "";
+      if (isSafeImage(user.avatarUrl)) {
+        return `<span class="avatar-box"><img class="${cls}" src="${escapeHtml(user.avatarUrl)}" alt="${escapeHtml(user.name)}" />${dot}</span>`;
+      }
+      return `<span class="avatar-box"><span class="${cls}" style="background:${escapeHtml(user.color || "#1877f2")};">${escapeHtml(user.initials)}</span>${dot}</span>`;
+    }
+
+    function renderEmojiButtons(targetId) {
+      return `<div class="emoji-bar">${QUICK_EMOJIS.map((em) =>
+        `<button type="button" class="emoji-btn" onclick="insertEmoji('${targetId}', '${em}')">${em}</button>`
+      ).join("")}</div>`;
+    }
+
+    function pushNotif(text, actorId = state.currentUserId) {
+      state.notifications.unshift({
+        id: "n_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
+        actorId,
+        text,
+        time: nowTime(),
+        read: false
+      });
+    }
+
+    function renderBadge() {
+      const unread = state.notifications.filter((n) => !n.read).length;
+      const badge = document.getElementById("notifBadge");
+      if (!badge) return;
+      if (unread > 0) {
+        badge.style.display = "inline-flex";
+        badge.textContent = unread > 99 ? "99+" : String(unread);
+      } else {
+        badge.style.display = "none";
+      }
+    }
+
+    function switchTab(tab) {
+      purgeExpiredPunishments();
+      state.activeTab = tab;
+      if (tab !== "inspect") state.inspectedUserId = null;
+      document.querySelectorAll(".nav-btn").forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.tab === tab);
+      });
+      const dotsBtn = document.getElementById("dotsMenuBtn");
+      if (dotsBtn) dotsBtn.classList.toggle("active", tab === "menu");
+      saveState(false);
+      render();
+    }
+
+    function openUserProfile(userId) {
+      state.inspectedUserId = userId;
+      state.activeTab = "inspect";
+      saveState(false);
+      render();
+    }
+
+    function insertEmoji(targetId, emoji) {
+      const el = document.getElementById(targetId);
+      if (!el) return;
+      el.value = (el.value || "") + emoji;
+      el.focus();
+    }
+
+    function canCurrentUserSendMessages() {
+      const muteDays = getMuteRemainingDays(state.currentUserId);
+      return muteDays === 0;
+    }
+
+    function createPost(e) {
+      e.preventDefault();
+      if (!canCurrentUserSendMessages()) {
+        showToast("Имаш ограничение на съобщенията и постовете.");
+        return;
+      }
+      const textEl = document.getElementById("postText");
+      const imgEl = document.getElementById("postImage");
+      const text = textEl.value.trim();
+      const imageUrl = imgEl.value.trim();
+      if (!text && !imageUrl) return;
+
+      state.posts.unshift({
+        id: "p_" + Date.now(),
+        authorId: state.currentUserId,
+        text,
+        imageUrl,
+        time: nowTime(),
+        reactions: emptyReactions(),
+        comments: []
+      });
+
+      pushNotif("Публикува в Новини.");
+      textEl.value = "";
+      imgEl.value = "";
+      saveState(true);
+      render();
+      showToast("Публикувано в Новини!");
+    }
+
+    function toggleReaction(postId, type) {
+      const post = state.posts.find((p) => p.id === postId);
+      if (!post) return;
+      if (!post.reactions) post.reactions = emptyReactions();
+      const arr = post.reactions[type] || (post.reactions[type] = []);
+      const me = state.currentUserId;
+      const idx = arr.indexOf(me);
+      if (idx === -1) arr.push(me);
+      else arr.splice(idx, 1);
+      saveState(true);
+      render();
+    }
+
+    function addComment(e, postId) {
+      e.preventDefault();
+      if (!canCurrentUserSendMessages()) {
+        showToast("Ограничени съобщения — изчакай да минат дните.");
+        return;
+      }
+      const input = document.getElementById("commentInput_" + postId);
+      const text = input.value.trim();
+      if (!text) return;
+
+      const post = state.posts.find((p) => p.id === postId);
+      if (!post) return;
+
+      post.comments.push({
+        id: "c_" + Date.now(),
+        authorId: state.currentUserId,
+        text,
+        time: nowTime()
+      });
+
+      pushNotif("Коментира в Новини.");
+      input.value = "";
+      saveState(true);
+      render();
+    }
+
+    function deletePost(postId) {
+      state.posts = state.posts.filter((p) => p.id !== postId);
+      saveState(true);
+      render();
+      showToast("Постът е изтрит.");
+    }
+
+    function toggleFriend(userId) {
+      if (userId === state.currentUserId || state.blocked.includes(userId)) return;
+      const idx = state.friends.indexOf(userId);
+      const u = getUser(userId);
+      if (idx === -1) {
+        state.friends.push(userId);
+        if (!state.messages[userId]) state.messages[userId] = [];
+        state.selectedChatUserId = userId;
+        pushNotif("Добави " + u.name + " като приятел.", userId);
+        showToast(u.name + " е добавен към приятелите!");
+      } else {
+        state.friends.splice(idx, 1);
+        showToast(u.name + " е премахнат от приятелите.");
+      }
+      saveState(true);
+      render();
+    }
+
+    function selectChat(userId) {
+      state.selectedChatUserId = userId;
+      saveState(false);
+      render();
+    }
+
+    function sendMessage(e) {
+      e.preventDefault();
+      const muteDays = getMuteRemainingDays(state.currentUserId);
+      if (muteDays > 0) {
+        showToast("Съобщенията ти са ограничени още " + muteDays + " д.");
+        return;
+      }
+
+      const input = document.getElementById("msgInput");
+      const text = input.value.trim();
+      const targetId = state.selectedChatUserId;
+      if (!text || !targetId) return;
+
+      const banDays = getBanRemainingDays(state.currentUserId);
+      if (banDays > 0 && targetId !== OWNER_ID) {
+        showToast("При активен бан можеш да пишеш само на собственика (" + getUser(OWNER_ID).name + ").");
+        return;
+      }
+
+      if (!state.messages[targetId]) state.messages[targetId] = [];
+      state.messages[targetId].push({
+        id: "m_" + Date.now(),
+        from: state.currentUserId,
+        text,
+        time: nowTime()
+      });
+
+      pushNotif("Ново съобщение до " + getUser(targetId).name + ".", targetId);
+      input.value = "";
+      saveState(true);
+      render();
+
+      const box = document.getElementById("chatThread");
+      if (box) box.scrollTop = box.scrollHeight;
+    }
+
+    function markAllRead() {
+      state.notifications.forEach((n) => (n.read = true));
+      saveState(false);
+      render();
+    }
+
+    function readImageSquare(file, onDone) {
+      const reader = new FileReader();
+      reader.onload = function () {
+        const img = new Image();
+        img.onload = function () {
+          const canvas = document.createElement("canvas");
+          const size = 180;
+          canvas.width = size;
+          canvas.height = size;
+          const ctx = canvas.getContext("2d");
+          const minSide = Math.min(img.width, img.height);
+          const sx = (img.width - minSide) / 2;
+          const sy = (img.height - minSide) / 2;
+          ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, size, size);
+          onDone(canvas.toDataURL("image/jpeg", 0.82));
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function handleAvatarFile(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      readImageSquare(file, (dataUrl) => {
+        const urlInput = document.getElementById("profileAvatarUrl");
+        if (urlInput) urlInput.value = dataUrl;
+      });
+    }
+
+    function handleRegAvatarFile(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      readImageSquare(file, (dataUrl) => {
+        const urlInput = document.getElementById("regAvatarUrl");
+        if (urlInput) urlInput.value = dataUrl;
+        if (state.pendingReg) {
+          state.pendingReg.avatarUrl = dataUrl;
+          saveState(false);
+          render();
+        }
+      });
+    }
+
+    function saveProfile(e) {
+      e.preventDefault();
+      const nameVal = document.getElementById("profileName").value.trim();
+      const bioVal = document.getElementById("profileBio").value.trim();
+      const avatarVal = document.getElementById("profileAvatarUrl").value.trim();
+
+      state.profileOverride = {
+        name: nameVal || "Ангел",
+        bio: bioVal,
+        avatarUrl: avatarVal
+      };
+      pushNotif("Обнови профила и аватара си.");
+      saveState(true);
+      render();
+      showToast("Профилът и аватарът са запазени!");
+    }
+
+    function resetAvatar() {
+      state.profileOverride.avatarUrl = "";
+      saveState(true);
+      render();
+    }
+
+    /* Създаване на нов профил с имейл/номер, име, снимка и 6-цифрен код */
+    function startRegistration(e) {
+      e.preventDefault();
+      const contact = (document.getElementById("regContact").value || "").trim();
+      const name = (document.getElementById("regName").value || "").trim();
+      const bio = (document.getElementById("regBio").value || "").trim();
+      const avatarUrl = (document.getElementById("regAvatarUrl").value || "").trim();
+
+      if (!contact || !name) {
+        state.regError = "Въведи имейл или телефонен номер и име.";
+        saveState(false);
+        render();
+        return;
+      }
+
+      const code = generateSixDigitCode();
+      state.regError = "";
+      state.regSuccessMsg = "";
+      state.pendingReg = {
+        contact,
+        name,
+        bio: bio || "Нов профил в LitePulse",
+        avatarUrl,
+        code
+      };
+      pushNotif("Код за регистрация " + code + " към " + contact + ".");
+      saveState(false);
+      render();
+      showToast("Кодът за потвърждение е изпратен: " + code);
+    }
+
+    function resendRegCode() {
+      if (!state.pendingReg) return;
+      const code = generateSixDigitCode();
+      state.pendingReg.code = code;
+      state.regError = "";
+      saveState(false);
+      render();
+      showToast("Нов код: " + code);
+    }
+
+    function cancelRegistration() {
+      state.pendingReg = null;
+      state.regError = "";
+      saveState(false);
+      render();
+    }
+
+    function verifyAndRegister(e) {
+      e.preventDefault();
+      if (!state.pendingReg) return;
+      const entered = (document.getElementById("regCodeInput").value || "").trim();
+      if (entered !== state.pendingReg.code) {
+        state.regError = "Грешен код. Провери кода по-горе.";
+        saveState(false);
+        render();
+        return;
+      }
+
+      const reg = state.pendingReg;
+      const newId = "u_" + Date.now();
+      const palette = ["#1877f2", "#0f9d58", "#d93025", "#673ab7", "#e67e22"];
+      const color = palette[state.customUsers.length % palette.length];
+
+      state.customUsers.push({
+        id: newId,
+        name: reg.name,
+        contact: reg.contact,
+        initials: makeInitials(reg.name),
+        color,
+        bio: reg.bio,
+        avatarUrl: reg.avatarUrl,
+        online: true
+      });
+
+      state.currentUserId = newId;
+      state.profileOverride = { name: reg.name, bio: reg.bio, avatarUrl: reg.avatarUrl };
+      state.pendingReg = null;
+      state.regError = "";
+      state.regSuccessMsg = "Профилът на " + reg.name + " е регистриран успешно!";
+      pushNotif("Нов регистриран профил: " + reg.name + ".", newId);
+      saveState(true);
+      render();
+      showToast("Регистрацията е успешна!");
+    }
+
+    function switchAccount(userId) {
+      purgeExpiredPunishments();
+      const target = getAllUsers().find((u) => u.id === userId);
+      if (!target) return;
+
+      const banDays = getBanRemainingDays(userId);
+      if (banDays > 0) {
+        state.currentUserId = userId;
+        state.profileOverride = { name: target.name, bio: target.bio || "", avatarUrl: target.avatarUrl || "" };
+        state.selectedChatUserId = OWNER_ID;
+        state.activeTab = "messages";
+        saveState(false);
+        render();
+        showToast("Профилът е баннат още " + banDays + " д. — можеш да пишеш само на собственика.");
+        return;
+      }
+
+      state.currentUserId = userId;
+      state.profileOverride = { name: target.name, bio: target.bio || "", avatarUrl: target.avatarUrl || "" };
+      state.regSuccessMsg = "Активен профил: " + target.name + ".";
+      saveState(false);
+      render();
+      showToast("Влезе като " + target.name);
+    }
+
+    /* Собственик: създаване / продажба на Модератор (5 €) и Админ (20 €) */
+    function assignRoleByName(e, roleType) {
+      e.preventDefault();
+      if (!isOwner()) {
+        showToast("Само собственикът може да дава или продава роли.");
+        return;
+      }
+      const inputId = roleType === "admin" ? "adminNameInput" : "modNameInput";
+      const rawName = (document.getElementById(inputId).value || "").trim().toLowerCase();
+      if (!rawName) return;
+
+      const match = getAllUsers().find((u) => u.id !== OWNER_ID && u.name.toLowerCase().includes(rawName));
+      if (!match) {
+        showToast("Не е намерен потребител с такова име.");
+        return;
+      }
+
+      if (roleType === "admin") {
+        state.moderators = state.moderators.filter((id) => id !== match.id);
+        if (!state.admins.includes(match.id)) state.admins.push(match.id);
+        state.salesLog.unshift({
+          id: "s_" + Date.now(),
+          text: match.name + " получи роля ADMIN (" + ADMIN_PRICE_EUR + " €)",
+          time: nowTime()
+        });
+        pushNotif(match.name + " стана ADMIN.", match.id);
+        document.getElementById(inputId).value = "";
+        saveState(true);
+        render();
+        showToast(match.name + " вече е ADMIN!");
+      } else {
+        state.admins = state.admins.filter((id) => id !== match.id);
+        if (!state.moderators.includes(match.id)) state.moderators.push(match.id);
+        state.salesLog.unshift({
+          id: "s_" + Date.now(),
+          text: match.name + " получи роля MODERATOR (" + MOD_PRICE_EUR + " €)",
+          time: nowTime()
+        });
+        pushNotif(match.name + " стана MODERATOR.", match.id);
+        document.getElementById(inputId).value = "";
+        saveState(true);
+        render();
+        showToast(match.name + " вече е MODERATOR!");
+      }
+    }
+
+    function removeRole(userId) {
+      if (!isOwner()) return;
+      state.admins = state.admins.filter((id) => id !== userId);
+      state.moderators = state.moderators.filter((id) => id !== userId);
+      saveState(true);
+      render();
+      showToast("Ролята е премахната.");
+    }
+
+    /* Ограничаване на съобщения за дни (Модератор или Админ/Собственик) */
+    function muteUserDays(e) {
+      e.preventDefault();
+      if (!isOwner() && !isAdmin() && !isModerator()) {
+        showToast("Нямаш права за ограничаване на съобщения.");
+        return;
+      }
+      const targetId = document.getElementById("muteTargetSelect").value;
+      const days = Math.max(1, parseInt(document.getElementById("muteDaysSelect").value, 10) || 3);
+      if (!targetId || targetId === OWNER_ID) return;
+
+      state.mutedUntil[targetId] = Date.now() + days * DAY_MS;
+      const u = getUser(targetId);
+      pushNotif("Съобщенията на " + u.name + " са ограничени за " + days + " д.", targetId);
+      saveState(true);
+      render();
+      showToast("Ограничи съобщенията на " + u.name + " за " + days + " дни.");
+    }
+
+    function unmuteUser(userId) {
+      delete state.mutedUntil[userId];
+      saveState(true);
+      render();
+      showToast("Ограничението за съобщения е махнато.");
+    }
+
+    /* Админ / Собственик: бан за 3 или 4 дни (влиза само да пише на собственика) и изтриване на профил */
+    function banUserDays(e) {
+      e.preventDefault();
+      if (!isOwner() && !isAdmin()) {
+        showToast("Само Админ или Собственик може да банва профили.");
+        return;
+      }
+      const targetId = document.getElementById("banTargetSelect").value;
+      const days = parseInt(document.getElementById("banDaysSelect").value, 10) === 4 ? 4 : 3;
+      if (!targetId || targetId === OWNER_ID) return;
+
+      state.bannedUntil[targetId] = Date.now() + days * DAY_MS;
+      const u = getUser(targetId);
+      pushNotif("Профилът на " + u.name + " е баннат за " + days + " д.", targetId);
+      saveState(true);
+      render();
+      showToast("Банна " + u.name + " за " + days + " дни.");
+    }
+
+    function unbanUser(userId) {
+      if (!isOwner() && !isAdmin()) return;
+      delete state.bannedUntil[userId];
+      saveState(true);
+      render();
+      showToast("Банът е премахнат.");
+    }
+
+    function deleteProfileByAdmin(e) {
+      e.preventDefault();
+      if (!isOwner() && !isAdmin()) {
+        showToast("Само Админ или Собственик може да изтрива профили.");
+        return;
+      }
+      const targetId = document.getElementById("deleteProfileSelect").value;
+      if (!targetId || targetId === OWNER_ID) return;
+      const u = getUser(targetId);
+
+      if (!state.deletedUserIds.includes(targetId)) {
+        state.deletedUserIds.push(targetId);
+      }
+      state.friends = state.friends.filter((id) => id !== targetId);
+      state.admins = state.admins.filter((id) => id !== targetId);
+      state.moderators = state.moderators.filter((id) => id !== targetId);
+      delete state.mutedUntil[targetId];
+      delete state.bannedUntil[targetId];
+
+      if (state.currentUserId === targetId) {
+        state.currentUserId = OWNER_ID;
+      }
+      if (state.selectedChatUserId === targetId) {
+        state.selectedChatUserId = "ivan";
+      }
+
+      pushNotif("Админ изтри профила на " + u.name + ".", OWNER_ID);
+      saveState(true);
+      render();
+      showToast("Профилът на " + u.name + " е изтрит.");
+    }
+
+    function renderFeed() {
+      const me = getUser(state.currentUserId);
+      const muteDays = getMuteRemainingDays(state.currentUserId);
+
+      const composerHtml = `
+        ${muteDays > 0 ? `<div class="warn-banner">Съобщенията и публикациите ти са ограничени още ${muteDays} ${muteDays === 1 ? "ден" : "дни"}. Като минат дните, ще можеш пак да пишеш.</div>` : ""}
+        <div class="card">
+          <form onsubmit="createPost(event)">
+            <div class="composer-top">
+              ${renderAvatar(me, "", true)}
+              <div style="flex:1;">
+                <textarea id="postText" placeholder="Сподели новина, ${escapeHtml(me.name)}..."></textarea>
+                ${renderEmojiButtons("postText")}
+              </div>
+            </div>
+            <div class="composer-extra">
+              <input type="url" id="postImage" placeholder="Линк към снимка (по желание, https://...)" style="flex:1; min-width:180px;" />
+              <button type="submit" class="btn btn-primary">Публикувай</button>
+            </div>
+          </form>
+        </div>
+      `;
+
+      if (!state.posts.length) {
+        return composerHtml + `<div class="card empty-state">Няма новини все още. Напиши първия пост!</div>`;
+      }
+
+      const postsHtml = state.posts.map((p) => {
+        const author = getUser(p.authorId);
+        const rx = p.reactions || emptyReactions();
+        const totalReactions = REACTION_TYPES.reduce((acc, r) => acc + ((rx[r.key] || []).length), 0);
+        const canDelete = p.authorId === state.currentUserId || isAdmin();
+        const safeImg = isSafeImage(p.imageUrl) ? escapeHtml(p.imageUrl) : "";
+
+        const commentsHtml = p.comments.map((c) => {
+          const cAuthor = getUser(c.authorId);
+          return `
+            <div class="comment-item">
+              ${renderAvatar(cAuthor, "sm", false)}
+              <div class="comment-bubble">
+                <span class="comment-author" onclick="openUserProfile('${c.authorId}')" style="cursor:pointer;">${escapeHtml(cAuthor.name)}${renderRoleBadge(c.authorId)}</span>
+                <span>${escapeHtml(c.text)}</span>
+              </div>
+            </div>
+          `;
+        }).join("");
+
+        const reactChipsHtml = REACTION_TYPES.map((r) => {
+          const cnt = (rx[r.key] || []).length;
+          const active = (rx[r.key] || []).includes(state.currentUserId);
+          return `<button class="react-chip ${active ? "active" : ""}" onclick="toggleReaction('${p.id}', '${r.key}')">${r.icon} ${cnt}</button>`;
+        }).join("");
+
+        return `
+          <article class="card">
+            <div class="post-header">
+              <div class="post-author-wrap" onclick="openUserProfile('${p.authorId}')">
+                ${renderAvatar(author, "", true)}
+                <div>
+                  <div class="author-name">${escapeHtml(author.name)}${renderRoleBadge(p.authorId)}</div>
+                  <div class="post-time">${escapeHtml(p.time)}</div>
+                </div>
+              </div>
+              ${canDelete ? `<button class="btn-danger-text" onclick="deletePost('${p.id}')">Изтрий</button>` : ""}
+            </div>
+            ${p.text ? `<div class="post-text">${escapeHtml(p.text)}</div>` : ""}
+            ${safeImg ? `<img class="post-img" src="${safeImg}" alt="Снимка към новина" loading="lazy" />` : ""}
+            <div class="post-stats">
+              <span>${totalReactions} реакции</span>
+              <span>${p.comments.length} коментара</span>
+            </div>
+            <div class="reactions-row">${reactChipsHtml}</div>
+            <div class="comments-box">
+              ${commentsHtml}
+              <form class="comment-form" onsubmit="addComment(event, '${p.id}')">
+                <input type="text" id="commentInput_${p.id}" placeholder="Коментирай новината..." />
+                <button type="submit" class="btn btn-soft-blue">Прати</button>
+              </form>
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      return composerHtml + postsHtml;
+    }
+
+    function renderMessages() {
+      const banDays = getBanRemainingDays(state.currentUserId);
+      const muteDays = getMuteRemainingDays(state.currentUserId);
+      const me = getUser(state.currentUserId);
+      const ownerUser = getUser(OWNER_ID);
+
+      let chatUsers = getAllUsers().filter((u) => u.id !== state.currentUserId);
+      if (banDays > 0) {
+        chatUsers = chatUsers.filter((u) => u.id === OWNER_ID);
+        state.selectedChatUserId = OWNER_ID;
+      }
+
+      if (!chatUsers.length) {
+        return `<div class="card empty-state">Няма налични потребители за лайф чат.</div>`;
+      }
+
+      if (!chatUsers.some((u) => u.id === state.selectedChatUserId)) {
+        state.selectedChatUserId = chatUsers[0].id;
+      }
+
+      const activePartner = getUser(state.selectedChatUserId);
+      const thread = state.messages[activePartner.id] || [];
+
+      const pickerOptions = chatUsers.map((u) =>
+        `<option value="${u.id}" ${u.id === activePartner.id ? "selected" : ""}>${escapeHtml(u.name)}${getRoleLabel(u.id) ? " (" + getRoleLabel(u.id) + ")" : ""}</option>`
+      ).join("");
+
+      const msgsHtml = thread.length
+        ? thread.map((m) => {
+            const mine = m.from === state.currentUserId;
+            const sender = mine ? me : activePartner;
+            return `
+              <div class="msg-row ${mine ? "me" : ""}">
+                ${!mine ? renderAvatar(sender, "sm", false) : ""}
+                <div class="msg ${mine ? "me" : "them"}">
+                  <div>${escapeHtml(m.text)}</div>
+                  <div class="msg-meta">${escapeHtml(m.time)}</div>
+                </div>
+                ${mine ? renderAvatar(sender, "sm", false) : ""}
+              </div>
+            `;
+          }).join("")
+        : `<div class="empty-state">Лайф чат с ${escapeHtml(activePartner.name)} — пиши първото съобщение!</div>`;
+
+      return `
+        ${banDays > 0 ? `<div class="warn-banner">Профилът ти е баннат още ${banDays} ${banDays === 1 ? "ден" : "дни"}. По време на бана можеш да влизаш само да пишеш на собственика (${escapeHtml(ownerUser.name)}).</div>` : ""}
+        ${muteDays > 0 ? `<div class="warn-banner">Съобщенията ти са ограничени още ${muteDays} ${muteDays === 1 ? "ден" : "дни"}. Като минат дните, пак ще можеш да пишеш.</div>` : ""}
+        <div class="card">
+          <div class="chat-header-card">
+            <div style="display:flex; align-items:center; gap:10px; cursor:pointer;" onclick="openUserProfile('${activePartner.id}')">
+              ${renderAvatar(activePartner, "", true)}
+              <div>
+                <div class="author-name">${escapeHtml(activePartner.name)}${renderRoleBadge(activePartner.id)}</div>
+                <div class="post-time">Лайф чат · ${activePartner.online ? "На линия" : "Офлайн"}</div>
+              </div>
+            </div>
+            <span class="live-pill">LIVE</span>
+          </div>
+
+          <select id="chatSelect" onchange="selectChat(this.value)">${pickerOptions}</select>
+
+          <div class="chat-thread" id="chatThread">${msgsHtml}</div>
+
+          ${renderEmojiButtons("msgInput")}
+          <form class="comment-form" onsubmit="sendMessage(event)">
+            <input type="text" id="msgInput" placeholder="Напиши в лайф чата до ${escapeHtml(activePartner.name)}..." />
+            <button type="submit" class="btn btn-primary">Прати</button>
+          </form>
+        </div>
+      `;
+    }
+
+    function renderFriends() {
+      const others = getAllUsers().filter((u) => u.id !== state.currentUserId);
+      const rows = others.map((u) => {
+        const isFriend = state.friends.includes(u.id);
+        const mDays = getMuteRemainingDays(u.id);
+        const bDays = getBanRemainingDays(u.id);
+        const statusParts = [];
+        if (bDays > 0) statusParts.push("БАН " + bDays + "д.");
+        if (mDays > 0) statusParts.push("ОГРАНИЧЕН " + mDays + "д.");
+        if (!statusParts.length) statusParts.push(u.online ? "На линия" : "Офлайн");
+
+        return `
+          <div class="friend-row">
+            <div class="friend-info" onclick="openUserProfile('${u.id}')">
+              ${renderAvatar(u, "", true)}
+              <div>
+                <div class="author-name">${escapeHtml(u.name)}${renderRoleBadge(u.id)}</div>
+                <div class="sub-muted">${escapeHtml(statusParts.join(" · "))}</div>
+              </div>
+            </div>
+            <div class="row-actions">
+              <button class="btn btn-secondary" onclick="selectChat('${u.id}'); switchTab('messages');">Чат</button>
+              <button class="btn ${isFriend ? "btn-soft-blue" : "btn-primary"}" onclick="toggleFriend('${u.id}')">
+                ${isFriend ? "Приятели ✓" : "+ Добави"}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      return `
+        <div class="card">
+          <h3 class="section-title">Приятели и профили</h3>
+          ${rows || `<div class="empty-state">Няма други профили.</div>`}
+        </div>
+      `;
+    }
+
+    function renderNotifications() {
+      const itemsHtml = state.notifications.length
+        ? state.notifications.map((n) => {
+            const actor = getUser(n.actorId || state.currentUserId);
+            return `
+              <div class="notif-item ${n.read ? "" : "unread"}">
+                ${renderAvatar(actor, "", false)}
+                <div>
+                  <div style="font-size:14px; font-weight:${n.read ? "500" : "700"};">${escapeHtml(n.text)}</div>
+                  <div class="post-time">${escapeHtml(n.time)}</div>
+                </div>
+              </div>
+            `;
+          }).join("")
+        : `<div class="empty-state">Няма известия.</div>`;
+
+      return `
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:8px; flex-wrap:wrap;">
+            <h3 class="section-title" style="margin:0;">Известия</h3>
+            <button class="btn btn-soft-blue" onclick="markAllRead()">Маркирай като прочетени</button>
+          </div>
+          ${itemsHtml}
+        </div>
+      `;
+    }
+
+    function renderRegistrationCard() {
+      if (state.pendingReg) {
+        const p = state.pendingReg;
+        const previewUser = {
+          name: p.name,
+          initials: makeInitials(p.name),
+          color: "#1877f2",
+          avatarUrl: p.avatarUrl,
+          online: true
+        };
+        return `
+          <div class="card">
+            <h3 class="section-title">Потвърди кода за регистрация</h3>
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+              ${renderAvatar(previewUser, "", true)}
+              <div>
+                <div class="author-name">${escapeHtml(p.name)}</div>
+                <div class="sub-muted">Код изпратен до: ${escapeHtml(p.contact)}</div>
+              </div>
+            </div>
+            <div class="code-box">
+              <div class="sub-muted">6-цифрен код за потвърждение:</div>
+              <div class="code-digits">${escapeHtml(p.code)}</div>
+            </div>
+            <form onsubmit="verifyAndRegister(event)">
+              <div class="field-group">
+                <label class="field-label" for="regCodeInput">Въведи кода</label>
+                <input type="text" id="regCodeInput" placeholder="Напр. ${escapeHtml(p.code)}" maxlength="6" />
+                ${state.regError ? `<div class="error-text">${escapeHtml(state.regError)}</div>` : ""}
+              </div>
+              <div class="row-actions">
+                <button type="submit" class="btn btn-primary" style="flex:1;">Потвърди и регистрирай</button>
+                <button type="button" class="btn btn-soft-blue" onclick="resendRegCode()">Нов код</button>
+                <button type="button" class="btn btn-secondary" onclick="cancelRegistration()">Отказ</button>
+              </div>
+            </form>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="card">
+          <h3 class="section-title">Създаване на нов профил и аватар</h3>
+          <div class="sub-muted" style="margin-bottom:10px;">Имейл или номер, име, снимка за аватар и код за потвърждение</div>
+          <form onsubmit="startRegistration(event)">
+            <div class="field-group">
+              <label class="field-label" for="regContact">Имейл или телефонен номер</label>
+              <input type="text" id="regContact" placeholder="email@primer.bg или +359 88..." />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="regName">Име</label>
+              <input type="text" id="regName" placeholder="Въведи име" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="regBio">Кратко описание</label>
+              <input type="text" id="regBio" placeholder="За мен..." />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="regAvatarUrl">Снимка за аватар (линк или от телефон)</label>
+              <input type="text" id="regAvatarUrl" placeholder="https://... или качи снимка" />
+            </div>
+            <div class="composer-extra" style="margin-bottom:12px;">
+              <label class="btn btn-secondary" style="cursor:pointer;">
+                📷 Качи снимка за аватар
+                <input type="file" accept="image/*" onchange="handleRegAvatarFile(event)" style="display:none;" />
+              </label>
+            </div>
+            ${state.regError ? `<div class="error-text" style="margin-bottom:8px;">${escapeHtml(state.regError)}</div>` : ""}
+            <button type="submit" class="btn btn-primary" style="width:100%;">Изпрати код и регистрирай</button>
+          </form>
+        </div>
+      `;
+    }
+
+    function renderProfile() {
+      const me = getUser(state.currentUserId);
+      const allUsers = getAllUsers();
+
+      return `
+        ${state.regSuccessMsg ? `<div class="success-banner">${escapeHtml(state.regSuccessMsg)}</div>` : ""}
+        <div class="card">
+          <div style="display:flex; align-items:center; gap:14px; margin-bottom:14px;">
+            ${renderAvatar(me, "lg", true)}
+            <div>
+              <div style="font-size:18px; font-weight:800;">${escapeHtml(me.name)}${renderRoleBadge(state.currentUserId)}</div>
+              <div class="sub-muted">${escapeHtml(me.contact || "Профил в LitePulse")}</div>
+              <div class="sub-muted">${escapeHtml(me.bio || "")}</div>
+            </div>
+          </div>
+
+          <form onsubmit="saveProfile(event)">
+            <div class="field-group">
+              <label class="field-label" for="profileName">Име на профила</label>
+              <input type="text" id="profileName" value="${escapeHtml(me.name)}" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="profileBio">Описание</label>
+              <input type="text" id="profileBio" value="${escapeHtml(me.bio)}" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="profileAvatarUrl">Снимка за аватар (линк или от телефон)</label>
+              <input type="text" id="profileAvatarUrl" value="${escapeHtml(me.avatarUrl)}" placeholder="https://... или качи снимка" />
+            </div>
+            <div class="composer-extra" style="margin-bottom:12px;">
+              <label class="btn btn-secondary" style="cursor:pointer;">
+                📷 Смени аватара
+                <input type="file" accept="image/*" onchange="handleAvatarFile(event)" style="display:none;" />
+              </label>
+              <button type="button" class="btn btn-secondary" onclick="resetAvatar()">Махни снимката</button>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;">Запази профила и аватара</button>
+          </form>
+        </div>
+
+        ${renderRegistrationCard()}
+
+        <div class="card">
+          <h3 class="section-title">Всички профили (${allUsers.length})</h3>
+          ${allUsers.map((u) => {
+            const active = u.id === state.currentUserId;
+            return `
+              <div class="friend-row">
+                <div class="friend-info" onclick="openUserProfile('${u.id}')">
+                  ${renderAvatar(u, "", true)}
+                  <div>
+                    <div class="author-name">${escapeHtml(u.name)}${renderRoleBadge(u.id)} ${active ? "(Активен)" : ""}</div>
+                    <div class="sub-muted">${escapeHtml(u.contact || u.bio || "")}</div>
+                  </div>
+                </div>
+                ${!active ? `<button class="btn btn-soft-blue" onclick="switchAccount('${u.id}')">Влез</button>` : `<span class="live-pill">Тук си</span>`}
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
+    }
+
+    function renderInspectProfile() {
+      const uid = state.inspectedUserId || state.currentUserId;
+      const u = getUser(uid);
+      const mDays = getMuteRemainingDays(uid);
+      const bDays = getBanRemainingDays(uid);
+
+      return `
+        <div class="card">
+          <button class="btn btn-secondary" onclick="switchTab('feed')" style="margin-bottom:12px;">← Назад към Новини</button>
+          <div style="display:flex; align-items:center; gap:14px;">
+            ${renderAvatar(u, "lg", true)}
+            <div>
+              <div style="font-size:20px; font-weight:800;">${escapeHtml(u.name)}${renderRoleBadge(uid)}</div>
+              <div class="sub-muted">${escapeHtml(u.bio || "Профил в LitePulse")}</div>
+              ${mDays > 0 ? `<div class="error-text">Ограничени съобщения още ${mDays} д.</div>` : ""}
+              ${bDays > 0 ? `<div class="error-text">Баннат профил още ${bDays} д.</div>` : ""}
+            </div>
+          </div>
+          ${uid !== state.currentUserId ? `
+            <div class="composer-extra" style="margin-top:14px;">
+              <button class="btn btn-primary" onclick="selectChat('${uid}'); switchTab('messages');">Пиши в лайф чата</button>
+            </div>
+          ` : ""}
+        </div>
+      `;
+    }
+
+    function renderMenuSettings() {
+      const me = getUser(state.currentUserId);
+      const targets = getAllUsers().filter((u) => u.id !== OWNER_ID);
+      const targetOptions = targets.map((u) =>
+        `<option value="${u.id}">${escapeHtml(u.name)}${getRoleLabel(u.id) ? " (" + getRoleLabel(u.id) + ")" : ""}</option>`
+      ).join("");
+
+      const hasModAccess = isOwner() || isAdmin() || isModerator();
+      const hasAdminAccess = isOwner() || isAdmin();
+      const ownerAccess = isOwner();
+
+      const fbHeaderAndShortcuts = `
+        <div class="card">
+          <h3 class="section-title">Настройки и меню</h3>
+          <div class="fb-profile-card" onclick="switchTab('profile')">
+            <div style="display:flex; align-items:center; gap:10px;">
+              ${renderAvatar(me, "", true)}
+              <div>
+                <div class="author-name">${escapeHtml(me.name)}${renderRoleBadge(state.currentUserId)}</div>
+                <div class="sub-muted">Профил, аватар и превключване</div>
+              </div>
+            </div>
+            <span>›</span>
+          </div>
+
+          <button class="fb-create-page" onclick="switchTab('profile')">
+            <span>＋</span>
+            <span>Създай нов профил / аватар</span>
+          </button>
+
+          <div class="shortcuts-grid">
+            <button class="shortcut-tile" onclick="switchTab('feed')">
+              <span>📰</span>
+              <div>
+                <div class="author-name" style="font-size:13px;">Новини</div>
+                <div class="sub-muted">Лента</div>
+              </div>
+            </button>
+            <button class="shortcut-tile" onclick="switchTab('messages')">
+              <span>💬</span>
+              <div>
+                <div class="author-name" style="font-size:13px;">Съобщения</div>
+                <div class="sub-muted">Лайф чат</div>
+              </div>
+            </button>
+            <button class="shortcut-tile" onclick="switchTab('friends')">
+              <span>👥</span>
+              <div>
+                <div class="author-name" style="font-size:13px;">Приятели</div>
+                <div class="sub-muted">Контакти</div>
+              </div>
+            </button>
+            <button class="shortcut-tile" onclick="switchTab('notifications')">
+              <span>🔔</span>
+              <div>
+                <div class="author-name" style="font-size:13px;">Известия</div>
+                <div class="sub-muted">Активност</div>
+              </div>
+            </button>
+          </div>
+
+          <button class="menu-list-btn" onclick="switchTab('profile')">
+            <span class="menu-left"><span>⚙️</span><span>Настройки на профила</span></span>
+            <span>›</span>
+          </button>
+        </div>
+      `;
+
+      const ownerShopCard = ownerAccess ? `
+        <div class="card">
+          <h3 class="section-title">Продажба и даване на роли (само за теб)</h3>
+          <div class="sub-muted" style="margin-bottom:10px;">Другите нямат това меню. Напиши името и дай/продай ролята:</div>
+
+          <form onsubmit="assignRoleByName(event, 'moderator')" class="field-group">
+            <label class="field-label" for="modNameInput">Модератор <span class="price-tag">${MOD_PRICE_EUR} €</span></label>
+            <div style="display:flex; gap:8px;">
+              <input type="text" id="modNameInput" placeholder="Име на потребителя за MODERATOR..." />
+              <button type="submit" class="btn btn-soft-blue">Направи MODERATOR</button>
+            </div>
+            <div class="sub-muted" style="margin-top:4px;">Права на модератора: само да ограничава съобщенията на виновния за дни.</div>
+          </form>
+
+          <form onsubmit="assignRoleByName(event, 'admin')" class="field-group">
+            <label class="field-label" for="adminNameInput">Админ <span class="price-tag">${ADMIN_PRICE_EUR} €</span></label>
+            <div style="display:flex; gap:8px;">
+              <input type="text" id="adminNameInput" placeholder="Име на потребителя за ADMIN..." />
+              <button type="submit" class="btn btn-primary">Направи ADMIN</button>
+            </div>
+            <div class="sub-muted" style="margin-top:4px;">Права на админа: да изтрие профила на виновния, да банва за 3–4 дни и да ограничава съобщения.</div>
+          </form>
+
+          ${[...state.admins.map((id) => ({ id, role: "ADMIN" })), ...state.moderators.map((id) => ({ id, role: "MODERATOR" }))].map((item) => {
+            const u = getUser(item.id);
+            return `
+              <div class="friend-row">
+                <div class="friend-info" onclick="openUserProfile('${item.id}')">
+                  ${renderAvatar(u, "", true)}
+                  <div>
+                    <div class="author-name">${escapeHtml(u.name)}${renderRoleBadge(item.id)}</div>
+                    <div class="sub-muted">Активна роля ${escapeHtml(item.role)}</div>
+                  </div>
+                </div>
+                <button class="btn btn-danger-soft" onclick="removeRole('${item.id}')">Махни роля</button>
+              </div>
+            `;
+          }).join("")}
+
+          ${state.salesLog.length ? `
+            <div style="margin-top:10px; padding-top:8px; border-top:1px solid var(--border);">
+              <div class="field-label">История на роли / продажби</div>
+              ${state.salesLog.slice(0, 6).map((s) => `<div class="sub-muted">• ${escapeHtml(s.text)} (${escapeHtml(s.time)})</div>`).join("")}
+            </div>
+          ` : ""}
+        </div>
+      ` : "";
+
+      const moderatorMenuCard = hasModAccess ? `
+        <div class="card">
+          <h3 class="section-title">Модератор меню</h3>
+          <div class="sub-muted" style="margin-bottom:10px;">Ограничаване на съобщенията на виновния за избрани дни — като минат дните, може пак да пише:</div>
+          ${targets.length ? `
+            <form onsubmit="muteUserDays(event)">
+              <div class="field-group">
+                <label class="field-label" for="muteTargetSelect">Виновен потребител</label>
+                <select id="muteTargetSelect">${targetOptions}</select>
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="muteDaysSelect">Дни ограничение на съобщенията</label>
+                <select id="muteDaysSelect">
+                  <option value="3">3 дни</option>
+                  <option value="6">6 дни</option>
+                  <option value="20">20 дни</option>
+                  <option value="1">1 ден</option>
+                  <option value="4">4 дни</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-primary" style="width:100%;">Ограничи съобщенията</button>
+            </form>
+          ` : `<div class="empty-state">Няма други потребители.</div>`}
+
+          ${Object.keys(state.mutedUntil).map((uid) => {
+            const daysLeft = getMuteRemainingDays(uid);
+            if (!daysLeft) return "";
+            const u = getUser(uid);
+            return `
+              <div class="friend-row">
+                <div>
+                  <div class="author-name">${escapeHtml(u.name)}</div>
+                  <div class="sub-muted">Ограничени съобщения още ${daysLeft} ${daysLeft === 1 ? "ден" : "дни"}</div>
+                </div>
+                <button class="btn btn-secondary" onclick="unmuteUser('${uid}')">Свали ограничението</button>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      ` : "";
+
+      const adminMenuCard = hasAdminAccess ? `
+        <div class="card">
+          <h3 class="section-title">Админи меню</h3>
+          <div class="sub-muted" style="margin-bottom:10px;">Бан за 3 или 4 дни (влиза само да пише на теб) или изтриване на профила на виновния:</div>
+          ${targets.length ? `
+            <form onsubmit="banUserDays(event)" class="field-group">
+              <label class="field-label" for="banTargetSelect">Бан за 3 или 4 дни</label>
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <select id="banTargetSelect" style="flex:1; min-width:150px;">${targetOptions}</select>
+                <select id="banDaysSelect" style="width:110px;">
+                  <option value="3">3 дни</option>
+                  <option value="4">4 дни</option>
+                </select>
+                <button type="submit" class="btn btn-danger-soft">Банни</button>
+              </div>
+            </form>
+
+            <form onsubmit="deleteProfileByAdmin(event)">
+              <label class="field-label" for="deleteProfileSelect">Изтриване на профила на виновния</label>
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <select id="deleteProfileSelect" style="flex:1; min-width:170px;">${targetOptions}</select>
+                <button type="submit" class="btn btn-danger-soft">Изтрий профил</button>
+              </div>
+            </form>
+          ` : `<div class="empty-state">Няма други потребители.</div>`}
+
+          ${Object.keys(state.bannedUntil).map((uid) => {
+            const daysLeft = getBanRemainingDays(uid);
+            if (!daysLeft) return "";
+            const u = getUser(uid);
+            return `
+              <div class="friend-row">
+                <div>
+                  <div class="author-name">${escapeHtml(u.name)}</div>
+                  <div class="sub-muted">Баннат още ${daysLeft} ${daysLeft === 1 ? "ден" : "дни"} (пише само на теб)</div>
+                </div>
+                <button class="btn btn-secondary" onclick="unbanUser('${uid}')">Отбанни</button>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      ` : "";
+
+      return fbHeaderAndShortcuts + ownerShopCard + moderatorMenuCard + adminMenuCard;
+    }
+
+    function render() {
+      purgeExpiredPunishments();
+      const banDays = getBanRemainingDays(state.currentUserId);
+      if (banDays > 0 && state.activeTab !== "messages" && state.activeTab !== "profile") {
+        state.activeTab = "messages";
+        state.selectedChatUserId = OWNER_ID;
+      }
+
+      const me = getUser(state.currentUserId);
+      const topAvatarWrap = document.getElementById("topAvatarWrap");
+      const topName = document.getElementById("topName");
+      if (topAvatarWrap) topAvatarWrap.innerHTML = renderAvatar(me, "sm", false);
+      if (topName) topName.textContent = me.name;
+      renderBadge();
+
+      document.querySelectorAll(".nav-btn").forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.tab === state.activeTab);
+      });
+      const dotsBtn = document.getElementById("dotsMenuBtn");
+      if (dotsBtn) dotsBtn.classList.toggle("active", state.activeTab === "menu");
+
+      const app = document.getElementById("app");
+      if (!app) return;
+      if (state.activeTab === "messages") app.innerHTML = renderMessages();
+      else if (state.activeTab === "friends") app.innerHTML = renderFriends();
+      else if (state.activeTab === "notifications") app.innerHTML = renderNotifications();
+      else if (state.activeTab === "profile") app.innerHTML = renderProfile();
+      else if (state.activeTab === "menu") app.innerHTML = renderMenuSettings();
+      else if (state.activeTab === "inspect") app.innerHTML = renderInspectProfile();
+      else app.innerHTML = renderFeed();
+    }
+
+    render();
+  </script>
+</body>
+</html>

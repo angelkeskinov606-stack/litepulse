@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LitePulse</title>
+  <style>
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+    body { margin: 0; background: #f3f4f6; color: #111827; padding-bottom: 72px; }
+    header {
+      position: sticky; top: 0; z-index: 10;
+      background: #fff; border-bottom: 1px solid #e5e7eb;
+      padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;
+    }
+    .brand { font-size: 20px; font-weight: 800; color: #1877f2; }
+    .user-pill { background: #eff6ff; color: #1d4ed8; padding: 5px 10px; border-radius: 999px; font-weight: 600; font-size: 13px; }
+
+    .container { max-width: 560px; margin: 0 auto; padding: 12px; }
+    .card { background: #fff; border-radius: 14px; padding: 14px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+
+    /* СТОРИТА */
+    .stories-row { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px; }
+    .story-item {
+      min-width: 96px; height: 145px; border-radius: 14px; position: relative;
+      overflow: hidden; background: #1e293b; color: #fff; cursor: pointer; flex-shrink: 0;
+      display: flex; flex-direction: column; justify-content: flex-end; padding: 8px;
+    }
+    .story-item.add-story {
+      background: #eff6ff; color: #1d4ed8; border: 2px dashed #93c5fd;
+      justify-content: center; align-items: center; text-align: center; gap: 6px;
+    }
+    .story-item img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .story-overlay { position: relative; z-index: 2; text-shadow: 0 1px 4px rgba(0,0,0,0.85); }
+    .story-name { font-size: 12px; font-weight: 700; }
+    .story-music { font-size: 11px; opacity: 0.95; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 82px; }
+
+    /* НОВИНИ / ПОСТОВЕ */
+    textarea, input[type="text"], select {
+      width: 100%; border: 1px solid #d1d5db; border-radius: 10px; padding: 10px; font-size: 14px;
+    }
+    .post-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; align-items: center; justify-content: space-between; }
+    .btn {
+      border: none; border-radius: 10px; padding: 9px 14px; font-weight: 600; cursor: pointer; font-size: 14px;
+    }
+    .btn-primary { background: #1877f2; color: #fff; }
+    .btn-soft { background: #f3f4f6; color: #111827; }
+    .post-img { width: 100%; max-height: 320px; object-fit: cover; border-radius: 10px; margin-top: 10px; }
+    .reactions { display: flex; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #f1f5f9; }
+    .react-btn {
+      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 999px;
+      padding: 5px 11px; cursor: pointer; font-size: 13px; font-weight: 600;
+    }
+    .react-btn.active { background: #dbeafe; border-color: #60a5fa; color: #1d4ed8; }
+
+    /* СЪОБЩЕНИЯ КАТО MESSENGER */
+    .thread-row {
+      display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 12px; cursor: pointer;
+    }
+    .thread-row:hover { background: #f3f4f6; }
+    .avatar {
+      width: 46px; height: 46px; border-radius: 50%; background: #f97316; color: #fff;
+      display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;
+    }
+    .thread-main { flex: 1; min-width: 0; }
+    .thread-top { display: flex; justify-content: space-between; gap: 8px; }
+    .thread-name { font-weight: 700; font-size: 15px; }
+    .thread-time { font-size: 12px; color: #6b7280; }
+    .thread-preview { font-size: 13px; color: #4b5563; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+
+    .chat-box { max-height: 360px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin: 10px 0; }
+    .bubble { max-width: 78%; padding: 9px 13px; border-radius: 14px; font-size: 14px; }
+    .bubble.me { align-self: flex-end; background: #1877f2; color: #fff; }
+    .bubble.them { align-self: flex-start; background: #e5e7eb; color: #111827; }
+    .bubble-time { font-size: 11px; opacity: 0.75; margin-top: 3px; }
+
+    /* МОДАЛ ЗА СТОРИ */
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.65); display: none;
+      align-items: center; justify-content: center; padding: 16px; z-index: 30;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-card { background: #fff; border-radius: 16px; padding: 16px; width: 100%; max-width: 420px; }
+
+    /* ДОЛНА НАВИГАЦИЯ */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0; background: #fff;
+      border-top: 1px solid #e5e7eb; display: flex; justify-content: space-around; padding: 8px 4px; z-index: 20;
+    }
+    .nav-btn {
+      background: none; border: none; font-size: 12px; font-weight: 600; color: #6b7280;
+      display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; padding: 4px 10px;
+    }
+    .nav-btn.active { color: #1877f2; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">LitePulse</div>
+    <div class="user-pill">АН · Ангел</div>
+  </header>
+
+  <div class="container">
+    <!-- ТАБ 1: НОВИНИ + СТОРИТА ОТПРЕД -->
+    <section id="tab-news">
+      <div class="card">
+        <div id="stories-list" class="stories-row"></div>
+      </div>
+
+      <div class="card">
+        <textarea id="post-text" rows="2" placeholder="Какво ти е на ум, Ангел?"></textarea>
+        <div class="post-actions">
+          <label class="btn btn-soft">
+            📷 Добави снимка
+            <input type="file" id="post-image-input" accept="image/*" hidden />
+          </label>
+          <span id="post-image-name" style="font-size:12px; color:#4b5563;"></span>
+          <button type="button" id="publish-post-btn" class="btn btn-primary">Публикувай</button>
+        </div>
+      </div>
+
+      <div id="feed-list"></div>
+    </section>
+
+    <!-- ТАБ 2: СЪОБЩЕНИЯ (СПИСЪК С ИЗПРАТЕНИ ЧАТОВЕ) -->
+    <section id="tab-messages" style="display:none;">
+      <div id="inbox-panel" class="card">
+        <h3 style="margin:0 0 8px 0; font-size:16px;">Съобщения</h3>
+        <div id="sent-threads-list"></div>
+      </div>
+
+      <div id="active-chat-panel" class="card" style="display:none;">
+        <div style="display:flex; align-items:center; gap:10px; border-bottom:1px solid #e5e7eb; padding-bottom:10px;">
+          <button type="button" id="back-to-threads" class="btn btn-soft">← Назад</button>
+          <strong id="chat-peer-name"></strong>
+        </div>
+        <div id="chat-history" class="chat-box"></div>
+        <form id="send-msg-form" style="display:flex; gap:8px;">
+          <input type="text" id="msg-text-input" placeholder="Напиши съобщение..." required />
+          <button type="submit" class="btn btn-primary">Прати</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ТАБ 3: ПРИЯТЕЛИ (БЪРЗ ВХОД В ЧАТ БЕЗ ПАДАЩО МЕНЮ) -->
+    <section id="tab-friends" style="display:none;">
+      <div class="card">
+        <h3 style="margin:0 0 8px 0; font-size:16px;">Приятели</h3>
+        <div id="friends-list"></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- МОДАЛ ЗА ДОБАВЯНЕ НА СТОРИ -->
+  <div id="add-story-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <h3 style="margin-top:0;">Добави стори</h3>
+      <form id="story-form" style="display:flex; flex-direction:column; gap:10px;">
+        <label class="btn btn-soft" style="text-align:center;">
+          🖼️ Избери снимка за сторито
+          <input type="file" id="story-photo-input" accept="image/*" required hidden />
+        </label>
+        <div id="story-preview-box" style="font-size:12px; color:#4b5563;">Няма избрана снимка</div>
+
+        <label style="font-size:13px; font-weight:600;">Избери музика:</label>
+        <select id="story-music-select">
+          <option value="🎵 Ghostemane - Mercury">🎵 Ghostemane - Mercury</option>
+          <option value="🎵 Sxmpra - COWBELL WARRIOR!">🎵 Sxmpra - COWBELL WARRIOR!</option>
+          <option value="🎵 Кали - Потърси ме">🎵 Кали - Потърси ме</option>
+          <option value="🎵 Emrah - Belalım Benim">🎵 Emrah - Belalım Benim</option>
+        </select>
+
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:6px;">
+          <button type="button" id="close-story-modal" class="btn btn-soft">Отказ</button>
+          <button type="submit" class="btn btn-primary">Качи стори</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- МОДАЛ ЗА ГЛЕДАНЕ НА СТОРИ -->
+  <div id="view-story-modal" class="modal-backdrop">
+    <div class="modal-card" style="text-align:center;">
+      <div id="view-story-author" style="font-weight:700; margin-bottom:4px;"></div>
+      <div id="view-story-music" style="font-size:13px; color:#1d4ed8; margin-bottom:10px;"></div>
+      <img id="view-story-img" src="" alt="" style="width:100%; max-height:340px; object-fit:cover; border-radius:12px;" />
+      <button type="button" id="close-view-story" class="btn btn-soft" style="margin-top:12px; width:100%;">Затвори</button>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <button type="button" class="nav-btn active" data-tab="news">📰<span>Новини</span></button>
+    <button type="button" class="nav-btn" data-tab="messages">💬<span>Съобщения</span></button>
+    <button type="button" class="nav-btn" data-tab="friends">👥<span>Приятели</span></button>
+  </nav>
+
+  <script>
+    const STORAGE_KEYS = {
+      stories: "litepulse_stories_v1",
+      posts: "litepulse_posts_v1",
+      chats: "litepulse_chats_v1"
+    };
+
+    const people = [
+      { id: "maria", name: "Мария Николова", initials: "МН" },
+      { id: "ivan", name: "Иван Петров", initials: "ИП" },
+      { id: "elena", name: "Елена Георгиева", initials: "ЕГ" },
+      { id: "georgi", name: "Георги Димитров", initials: "ГД" }
+    ];
+
+    const defaultStories = [
+      {
+        author: "Мария Николова",
+        music: "🎵 Кали - Потърси ме",
+        img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=500&auto=format&fit=crop&q=60"
+      }
+    ];
+
+    const defaultPosts = [
+      {
+        id: 1,
+        author: "Мария Николова",
+        text: "Здравейте на всички в LitePulse! 😄",
+        img: "",
+        likes: 3,
+        laughs: 2,
+        likedByMe: false,
+        laughedByMe: false
+      }
+    ];
+
+    const defaultChats = {
+      maria: [
+        { text: "Здравей! На линия съм 👋", fromMe: false, time: "17:42" },
+        { text: "Хей", fromMe: true, time: "17:51" }
+      ],
+      ivan: [],
+      elena: [],
+      georgi: []
+    };
+
+    function loadFromStorage(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return structuredClone(fallback);
+        return JSON.parse(raw);
+      } catch {
+        return structuredClone(fallback);
+      }
+    }
+
+    function saveToStorage(key, value) {
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+      } catch (err) {
+        console.warn("localStorage limit reached:", err);
+      }
+    }
+
+    const stories = loadFromStorage(STORAGE_KEYS.stories, defaultStories);
+    const posts = loadFromStorage(STORAGE_KEYS.posts, defaultPosts);
+    const chats = Object.assign(
+      structuredClone(defaultChats),
+      loadFromStorage(STORAGE_KEYS.chats, defaultChats)
+    );
+
+    let selectedPostImageData = "";
+    let selectedStoryImageData = "";
+    let currentChatPeerId = null;
+
+    function nowTime() {
+      return new Date().toTimeString().slice(0, 5);
+    }
+
+    function fileToDataUrl(file, cb) {
+      const reader = new FileReader();
+      reader.onload = () => cb(reader.result);
+      reader.readAsDataURL(file);
+    }
+
+    // --- НАВИГАЦИЯ ---
+    document.querySelectorAll(".nav-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".nav-btn").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        const tab = btn.dataset.tab;
+        document.getElementById("tab-news").style.display = tab === "news" ? "block" : "none";
+        document.getElementById("tab-messages").style.display = tab === "messages" ? "block" : "none";
+        document.getElementById("tab-friends").style.display = tab === "friends" ? "block" : "none";
+        if (tab === "messages") renderSentThreads();
+        if (tab === "friends") renderFriends();
+      });
+    });
+
+    // --- СТОРИТА ---
+    const storiesListEl = document.getElementById("stories-list");
+    const addStoryModal = document.getElementById("add-story-modal");
+    const viewStoryModal = document.getElementById("view-story-modal");
+
+    function renderStories() {
+      storiesListEl.innerHTML = "";
+
+      const addCard = document.createElement("div");
+      addCard.className = "story-item add-story";
+      addCard.innerHTML = `<div style="font-size:24px; font-weight:700;">+</div><div style="font-size:12px; font-weight:700;">Добави стори</div>`;
+      addCard.addEventListener("click", () => addStoryModal.classList.add("open"));
+      storiesListEl.appendChild(addCard);
+
+      stories.forEach((s) => {
+        const card = document.createElement("div");
+        card.className = "story-item";
+        card.innerHTML = `
+          <img src="${s.img}" alt="" />
+          <div class="story-overlay">
+            <div class="story-name">${s.author}</div>
+            <div class="story-music">${s.music}</div>
+          </div>
+        `;
+        card.addEventListener("click", () => {
+          document.getElementById("view-story-author").textContent = s.author;
+          document.getElementById("view-story-music").textContent = s.music;
+          document.getElementById("view-story-img").src = s.img;
+          viewStoryModal.classList.add("open");
+        });
+        storiesListEl.appendChild(card);
+      });
+    }
+
+    document.getElementById("close-story-modal").addEventListener("click", () => addStoryModal.classList.remove("open"));
+    document.getElementById("close-view-story").addEventListener("click", () => viewStoryModal.classList.remove("open"));
+
+    document.getElementById("story-photo-input").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      document.getElementById("story-preview-box").textContent = `Избрана снимка: ${file.name}`;
+      fileToDataUrl(file, (dataUrl) => { selectedStoryImageData = dataUrl; });
+    });
+
+    document.getElementById("story-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (!selectedStoryImageData) return;
+      const music = document.getElementById("story-music-select").value;
+      stories.unshift({
+        author: "Ангел",
+        music,
+        img: selectedStoryImageData
+      });
+      saveToStorage(STORAGE_KEYS.stories, stories);
+
+      selectedStoryImageData = "";
+      document.getElementById("story-photo-input").value = "";
+      document.getElementById("story-preview-box").textContent = "Няма избрана снимка";
+      addStoryModal.classList.remove("open");
+      renderStories();
+    });
+
+    // --- НОВИНИ (ПОСТОВЕ, СНИМКИ, СМЯХ И ЛАЙКОВЕ) ---
+    document.getElementById("post-image-input").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      document.getElementById("post-image-name").textContent = file.name;
+      fileToDataUrl(file, (dataUrl) => { selectedPostImageData = dataUrl; });
+    });
+
+    document.getElementById("publish-post-btn").addEventListener("click", () => {
+      const text = document.getElementById("post-text").value.trim();
+      if (!text && !selectedPostImageData) return;
+
+      posts.unshift({
+        id: Date.now(),
+        author: "Ангел",
+        text,
+        img: selectedPostImageData,
+        likes: 0,
+        laughs: 0,
+        likedByMe: false,
+        laughedByMe: false
+      });
+      saveToStorage(STORAGE_KEYS.posts, posts);
+
+      document.getElementById("post-text").value = "";
+      document.getElementById("post-image-input").value = "";
+      document.getElementById("post-image-name").textContent = "";
+      selectedPostImageData = "";
+      renderFeed();
+    });
+
+    function renderFeed() {
+      const feedListEl = document.getElementById("feed-list");
+      feedListEl.innerHTML = "";
+
+      posts.forEach((p) => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <div style="font-weight:700; margin-bottom:6px;">${p.author}</div>
+          ${p.text ? `<div>${p.text}</div>` : ""}
+          ${p.img ? `<img class="post-img" src="${p.img}" alt="" />` : ""}
+          <div class="reactions">
+            <button type="button" class="react-btn ${p.likedByMe ? "active" : ""}" data-like="${p.id}">
+              👍 Лайк (${p.likes})
+            </button>
+            <button type="button" class="react-btn ${p.laughedByMe ? "active" : ""}" data-laugh="${p.id}">
+              😂 Смях (${p.laughs})
+            </button>
+          </div>
+        `;
+
+        card.querySelector(`[data-like="${p.id}"]`).addEventListener("click", () => {
+          p.likedByMe = !p.likedByMe;
+          p.likes += p.likedByMe ? 1 : -1;
+          saveToStorage(STORAGE_KEYS.posts, posts);
+          renderFeed();
+        });
+
+        card.querySelector(`[data-laugh="${p.id}"]`).addEventListener("click", () => {
+          p.laughedByMe = !p.laughedByMe;
+          p.laughs += p.laughedByMe ? 1 : -1;
+          saveToStorage(STORAGE_KEYS.posts, posts);
+          renderFeed();
+        });
+
+        feedListEl.appendChild(card);
+      });
+    }
+
+    // --- СЪОБЩЕНИЯ (САМО ЧАТОВЕ С ИЗПРАТЕНИ СЪОБЩЕНИЯ В СПИСЪКА) ---
+    function renderSentThreads() {
+      const listEl = document.getElementById("sent-threads-list");
+      listEl.innerHTML = "";
+
+      const sentContacts = people.filter((person) =>
+        (chats[person.id] || []).some((m) => m.fromMe)
+      );
+
+      if (sentContacts.length === 0) {
+        listEl.innerHTML = `<div style="color:#6b7280; font-size:14px;">Все още няма изпратени съобщения. Отвори „Приятели“, за да пишеш на някого.</div>`;
+        return;
+      }
+
+      sentContacts.forEach((person) => {
+        const msgs = chats[person.id] || [];
+        const last = msgs[msgs.length - 1];
+        const row = document.createElement("div");
+        row.className = "thread-row";
+        row.innerHTML = `
+          <div class="avatar">${person.initials}</div>
+          <div class="thread-main">
+            <div class="thread-top">
+              <span class="thread-name">${person.name}</span>
+              <span class="thread-time">${last ? last.time : ""}</span>
+            </div>
+            <div class="thread-preview">${last.fromMe ? `Ти: ${last.text}` : last.text}</div>
+          </div>
+        `;
+        row.addEventListener("click", () => openPersonChat(person.id));
+        listEl.appendChild(row);
+      });
+    }
+
+    function openPersonChat(personId) {
+      currentChatPeerId = personId;
+      const person = people.find((p) => p.id === personId);
+      document.querySelector('[data-tab="messages"]').click();
+      document.getElementById("inbox-panel").style.display = "none";
+      document.getElementById("active-chat-panel").style.display = "block";
+      document.getElementById("chat-peer-name").textContent = person ? person.name : "";
+      renderChatHistory();
+    }
+
+    function renderChatHistory() {
+      const box = document.getElementById("chat-history");
+      box.innerHTML = "";
+      const msgs = chats[currentChatPeerId] || [];
+      msgs.forEach((m) => {
+        const div = document.createElement("div");
+        div.className = `bubble ${m.fromMe ? "me" : "them"}`;
+        div.innerHTML = `<div>${m.text}</div><div class="bubble-time">${m.time}</div>`;
+        box.appendChild(div);
+      });
+      box.scrollTop = box.scrollHeight;
+    }
+
+    document.getElementById("back-to-threads").addEventListener("click", () => {
+      currentChatPeerId = null;
+      document.getElementById("active-chat-panel").style.display = "none";
+      document.getElementById("inbox-panel").style.display = "block";
+      renderSentThreads();
+    });
+
+    document.getElementById("send-msg-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const input = document.getElementById("msg-text-input");
+      const text = input.value.trim();
+      if (!text || !currentChatPeerId) return;
+
+      chats[currentChatPeerId].push({
+        text,
+        fromMe: true,
+        time: nowTime()
+      });
+      saveToStorage(STORAGE_KEYS.chats, chats);
+
+      input.value = "";
+      renderChatHistory();
+      renderSentThreads();
+    });
+
+    function renderFriends() {
+      const friendsEl = document.getElementById("friends-list");
+      friendsEl.innerHTML = "";
+      people.forEach((p) => {
+        const row = document.createElement("div");
+        row.className = "thread-row";
+        row.innerHTML = `
+          <div class="avatar">${p.initials}</div>
+          <div class="thread-main">
+            <div class="thread-name">${p.name}</div>
+            <div class="thread-preview">Натисни за чат</div>
+          </div>
+        `;
+        row.addEventListener("click", () => openPersonChat(p.id));
+        friendsEl.appendChild(row);
+      });
+    }
+
+    renderStories();
+    renderFeed();
+    renderSentThreads();
+  </script>
+</body>
+</html>
